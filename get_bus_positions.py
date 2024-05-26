@@ -12,9 +12,10 @@ def main():
 
 
 def execute():
+    feed = get_vehicle_positions("bus")
+    vehicles = parse_vehicle_position_feed(feed)
     connection = connect_to_db()
     cursor = connection.cursor()
-    vehicles = get_vehicles()
     table_name = load_config(section="tables")["bus_trolley_pos"]
 
     write_to_db(connection, cursor, table_name, data=vehicles)
@@ -22,8 +23,7 @@ def execute():
     connection.close()
 
 
-def get_vehicles():
-    feed = get_vehicle_positions("bus")
+def parse_vehicle_position_feed(feed):
     vehicles = []
     vehicle_count = 0
 
