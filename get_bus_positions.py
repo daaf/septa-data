@@ -27,19 +27,21 @@ def parse_vehicle_position_feed(feed):
     vehicle_count = 0
 
     for entity in feed:
-        vehicle_id = entity.id
         vehicle_count += 1
 
-        if vehicle_id == "None":
-            vehicle_id = None
-
+        timestamp = datetime.fromtimestamp(
+                entity.vehicle.timestamp).strftime("%Y-%m-%d, %H:%M:%S")
+        vehicle_id = entity.id
+        latitude = entity.vehicle.position.latitude
+        longitude = entity.vehicle.position.longitude
+        bearing = entity.vehicle.position.bearing
+        
         vehicle_position = {
-            "timestamp": datetime.fromtimestamp(
-                entity.vehicle.timestamp).strftime("%Y-%m-%d, %H:%M:%S"),
-            "vehicle_id": vehicle_id,
-            "latitude": entity.vehicle.position.latitude,
-            "longitude": entity.vehicle.position.longitude,
-            "bearing": entity.vehicle.position.bearing,
+            "timestamp": timestamp,
+            "vehicle_id": vehicle_id if vehicle_id != "None" else None,
+            "latitude": latitude if latitude != 0 else None,
+            "longitude": longitude if longitude != 0 else None,
+            "bearing": bearing,
             "trip_id": entity.vehicle.trip.trip_id,
         }
 
