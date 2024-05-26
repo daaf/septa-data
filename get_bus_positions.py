@@ -1,3 +1,4 @@
+from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from config import load_config
 from connect import connect_to_db
@@ -15,7 +16,7 @@ def execute():
     feed = get_vehicle_positions("bus")
     vehicles = parse_vehicle_position_feed(feed)
     connection = connect_to_db()
-    table_name = load_config(section="tables")["bus_trolley_pos"]
+    table_name = load_config(section="bus_trolley_positions")["table"]
 
     write_to_db(connection, table_name, data=vehicles)
     connection.close()
@@ -26,24 +27,23 @@ def parse_vehicle_position_feed(feed):
     vehicle_count = 0
 
     for entity in feed:
-        id = entity.id
+        vehicle_id = entity.id
         vehicle_count += 1
 
-        if id == "None":
-            id = None
+        if vehicle_id == "None":
+            vehicle_id = None
 
-        longitude =  entity.vehicle.position.longitude
-        latitude = entity.vehicle.position.latitude
-
-        vehicle = {
-            "id": id,
-            "timestamp": entity.vehicle.timestamp,
-            "position": f'POINT({longitude} {latitude})',
+        vehicle_position = {
+            "timestamp": datetime.fromtimestamp(
+                entity.vehicle.timestamp).strftime("%Y-%m-%d, %H:%M:%S"),
+            "vehicle_id": vehicle_id,
+            "latitude": entity.vehicle.position.latitude,
+            "longitude": entity.vehicle.position.longitude,
             "bearing": entity.vehicle.position.bearing,
             "trip_id": entity.vehicle.trip.trip_id,
         }
 
-        vehicles.append(vehicle)
+        vehicles.append(vehicle_position)
 
     write_to_console(f'Fetched data for {vehicle_count} vehicles')
 
