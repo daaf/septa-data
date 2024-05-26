@@ -1,7 +1,8 @@
 from datetime import datetime
 from psycopg2 import sql
 
-def write_to_db(connection, table_name, data: list[dict]):
+
+def to_db(connection, table_name, data: list[dict]):
     loaded_count = 0
 
     for entity in data:
@@ -22,9 +23,9 @@ def write_to_db(connection, table_name, data: list[dict]):
         except Exception as e:
             print(e)
 
-    write_to_console(f'Loaded data for {loaded_count} vehicles into the database')
+    to_console(f'Loaded data for {loaded_count} vehicles into the database')
 
 
-def write_to_console(str):
+def to_console(str):
     now = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
     print(f'{now}   {str}')
