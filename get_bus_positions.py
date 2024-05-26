@@ -15,11 +15,9 @@ def execute():
     feed = get_vehicle_positions("bus")
     vehicles = parse_vehicle_position_feed(feed)
     connection = connect_to_db()
-    cursor = connection.cursor()
     table_name = load_config(section="tables")["bus_trolley_pos"]
 
-    write_to_db(connection, cursor, table_name, data=vehicles)
-    cursor.close()
+    write_to_db(connection, table_name, data=vehicles)
     connection.close()
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from psycopg2 import sql
 
-def write_to_db(connection, cursor, table_name, data: list[dict]):
+def write_to_db(connection, table_name, data: list[dict]):
     loaded_count = 0
 
     for entity in data:
@@ -14,9 +14,10 @@ def write_to_db(connection, cursor, table_name, data: list[dict]):
                 value_placeholders=sql.SQL(', ').join(sql.Placeholder() * len(keys)))
 
         try:
-            cursor.execute(query, values)
-            connection.commit()
-            loaded_count += 1
+            with connection.cursor() as cursor:
+                cursor.execute(query, values)
+                connection.commit()
+                loaded_count += 1
         
         except Exception as e:
             print(e)
