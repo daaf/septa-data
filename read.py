@@ -1,7 +1,7 @@
 from psycopg2 import sql
 
 
-def fetch_from_db(connection, table_name: str, column_names: tuple[str]):
+def from_db(connection, table_name: str, column_names: tuple[str]):
     query = sql.SQL("SELECT {columns} FROM {table};").format(
         columns=sql.SQL(', ').join(map(sql.Identifier, column_names)),
         table=sql.Identifier(table_name))
