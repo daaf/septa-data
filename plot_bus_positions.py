@@ -38,11 +38,10 @@ def get_vehicle_position_gdf(df):
 def get_vehicle_path_gdf(df):
     df2 = pandas.DataFrame(df[["trip_id", "point"]])
     df2 = df2.groupby("trip_id")["point"].agg(list).reset_index(name="points")
-    df2["point_count"] = df.groupby("trip_id")["trip_id"].size().reset_index(name="point_count")["point_count"]
     df2["path"] = df2["points"].apply(convert_points_to_linestring)
     gdf = geopandas.GeoDataFrame(df2, geometry="path", crs="EPSG:4326")
 
-    return gdf.query("point_count > 25")
+    return gdf
 
 
 def convert_points_to_linestring(points: list):
