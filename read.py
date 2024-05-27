@@ -1,7 +1,8 @@
 from psycopg2 import sql
+from config import load_config
 
-
-def vehicle_positions(connection, table_name: str):
+def vehicle_positions(connection):
+    table_name = load_config(section="bus_trolley_positions")["table"]
     query = sql.SQL("""
             SELECT timestamp, vehicle_id, longitude, latitude, trip_id
             FROM {table}
@@ -11,7 +12,8 @@ def vehicle_positions(connection, table_name: str):
     return from_db(connection, query)
 
 
-def vehicle_positions_by_trip(connection, table_name:str):
+def vehicle_positions_by_trip(connection):
+    table_name = load_config(section="bus_trolley_positions")["table"]
     query = sql.SQL("""
             SELECT trip_id, vehicle_id, COUNT(*) AS trip_count, array_agg()
             FROM {table}

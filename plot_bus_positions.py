@@ -4,15 +4,13 @@ import pandas
 import geopandas
 from shapely.geometry import LineString
 from typing import Iterable
-from config import load_config
 from connect import connect_to_db
 import read
 
 
 def main():
     connection = connect_to_db()
-    table_name = load_config(section="bus_trolley_positions")["table"]
-    data = read.vehicle_positions(connection, table_name)
+    data = read.vehicle_positions(connection)
     column_names = ("timestamp", "vehicle_id", "longitude", "latitude", "trip_id")
     df = pandas.DataFrame(data, columns=column_names).sort_values(by=['timestamp'])
     
