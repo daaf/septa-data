@@ -8,9 +8,10 @@ from queries import get_vehicle_positions
 
 def main():
     scheduler = BlockingScheduler()
-    job = scheduler.add_job(execute, 'interval', minutes=2)
+    job = scheduler.add_job(execute, 'interval', minutes=5,
+                            start_date='2024-05-27 19:20:00',
+                            end_date='2024-05-27 19:20:00')
     scheduler.start()
-
 
 def execute():
     feed = get_vehicle_positions("bus")
@@ -43,6 +44,7 @@ def parse_vehicle_position_feed(feed):
             "longitude": longitude if longitude != 0 else None,
             "bearing": bearing,
             "trip_id": entity.vehicle.trip.trip_id,
+            "route_id": entity.vehicle.trip.route_id,
         }
 
         vehicles.append(vehicle_position)
