@@ -10,7 +10,7 @@ def main():
     scheduler = BlockingScheduler()
     job = scheduler.add_job(execute, 'interval', minutes=5,
                             start_date='2024-05-27 19:20:00',
-                            end_date='2024-05-27 19:20:00')
+                            end_date='2024-05-28 19:20:00')
     scheduler.start()
 
 def execute():
