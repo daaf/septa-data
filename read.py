@@ -1,11 +1,18 @@
 from psycopg2 import sql
+from config import load_config
+
+def vehicle_positions(connection):
+    table_name = load_config(section="bus_trolley_positions")["table"]
+    query = sql.SQL("""
+            SELECT timestamp, vehicle_id, longitude, latitude, trip_id
+            FROM {table}
+            ORDER BY trip_id;
+        """).format(table=sql.Identifier(table_name))
+    
+    return from_db(connection, query)
 
 
-def from_db(connection, table_name: str, column_names: tuple[str]):
-    query = sql.SQL("SELECT {columns} FROM {table};").format(
-        columns=sql.SQL(', ').join(map(sql.Identifier, column_names)),
-        table=sql.Identifier(table_name))
-
+def from_db(connection, query):
     with connection.cursor() as cursor:
         cursor.execute(query)
         data = cursor.fetchall()

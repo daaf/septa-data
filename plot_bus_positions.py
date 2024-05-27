@@ -1,52 +1,62 @@
 #%%
-import numpy
 import pandas
 import geopandas
-from typing import Iterable
-from config import load_config
+from shapely.geometry import LineString
 from connect import connect_to_db
 import read
 
 
 def main():
     connection = connect_to_db()
-    table_name = load_config(section="bus_trolley_positions")["table"]
+    data = read.vehicle_positions(connection)
     column_names = ("timestamp", "vehicle_id", "longitude", "latitude", "trip_id")
-    gdf = get_geopandas_dataframe(connection, table_name, column_names)
+    df = pandas.DataFrame(data, columns=column_names).sort_values(by=['timestamp'])
     
-    plot(gdf)
+    plot(df)
     connection.close()
+    
+
+def plot(df):
+    vehicle_position_gdf = get_vehicle_position_gdf(df)
+    vehicle_path_gdf = get_vehicle_path_gdf(vehicle_position_gdf)
+
+    base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
+    base_plot = base_shapefile.plot(color='white', edgecolor="black")
+    # vehicle_position_gdf.plot(ax=base_plot, markersize=5, column="trip_id")
+    vehicle_path_gdf.plot(ax=base_plot, markersize=5, column="trip_id")
+
+    return base_plot
 
 
-def get_geopandas_dataframe(connection, table_name, column_names):
-    data = read.from_db(connection, table_name, column_names)
-    df = pandas.DataFrame(data, columns=column_names)
-    marker_colors = get_random_color_per_unique_value(df["trip_id"], alpha=0.3)
-    df["color"] = df["trip_id"].map(lambda id: marker_colors[id])
-    gdf = geopandas.GeoDataFrame(df, geometry=geopandas.points_from_xy(df.longitude, df.latitude), crs="EPSG:4326")
+def get_vehicle_position_gdf(df):
+    df["point"] = geopandas.points_from_xy(df.longitude, df.latitude)
+    gdf = geopandas.GeoDataFrame(df, geometry="point", crs="EPSG:4326")
 
     return gdf
 
 
-def plot(gdf):
-    base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
-    base = base_shapefile.plot(color='white', edgecolor="black")
-    gdf.plot(ax=base, markersize=5, c=gdf["color"])
+def get_vehicle_path_gdf(df):
+    df2 = pandas.DataFrame(df[["trip_id", "point"]])
+    df2 = df2.groupby("trip_id")["point"].agg(list).reset_index(name="points")
+    df2["point_count"] = df.groupby("trip_id")["trip_id"].size().reset_index(name="point_count")["point_count"]
+    df2["path"] = df2["points"].apply(convert_points_to_linestring)
+    gdf = geopandas.GeoDataFrame(df2, geometry="path", crs="EPSG:4326")
+
+    return gdf.query("point_count > 25")
 
 
-def get_random_color_per_unique_value(values:Iterable, alpha=None):
-    colors = {}
-
-    for item in values:
-        if item not in colors:
-            new_color = list(numpy.random.uniform(0,1, size=3))
-            
-            if alpha:
-                new_color.append(alpha)
-            
-            colors[item] = new_color
-
-    return colors
+def convert_points_to_linestring(points: list):
+    filtered_points = list(filter(lambda point: not point.is_empty, points))
+    output = None
+    
+    if len(filtered_points) > 1:
+        try:
+            output = LineString(filtered_points)
+        except Exception as error:
+            print(error)
+            print(f'Point conversion failed for points: {points}')
+    
+    return output
 
 
 if __name__ == "__main__":
