@@ -12,18 +12,6 @@ def vehicle_positions(connection):
     return from_db(connection, query)
 
 
-def vehicle_positions_by_trip(connection):
-    table_name = load_config(section="bus_trolley_positions")["table"]
-    query = sql.SQL("""
-            SELECT trip_id, vehicle_id, COUNT(*) AS trip_count, array_agg()
-            FROM {table}
-            GROUP BY trip_id, vehicle_id
-            ORDER BY trip_count DESC;
-        """).format(table=sql.Identifier(table_name))
-    
-    return from_db(connection, query)
-
-
 def from_db(connection, query):
     with connection.cursor() as cursor:
         cursor.execute(query)

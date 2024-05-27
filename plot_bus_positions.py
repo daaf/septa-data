@@ -1,9 +1,7 @@
 #%%
-import numpy
 import pandas
 import geopandas
 from shapely.geometry import LineString
-from typing import Iterable
 from connect import connect_to_db
 import read
 
