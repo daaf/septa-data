@@ -17,15 +17,16 @@ def main():
     
 
 def plot_data(df):
-    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = 4
+    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = 7
 
     vehicle_position_gdf = get_vehicle_position_gdf(df)
     vehicle_path_gdf = get_vehicle_path_gdf(vehicle_position_gdf,
                                             MINIMUM_NUMBER_OF_POINTS_TO_PLOT)
-
+    
     base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
     base_plot = base_shapefile.plot(color='white', edgecolor="black")
-    vehicle_path_gdf.plot(ax=base_plot, column="trip_id")
+    vehicle_path_gdf.plot(ax=base_plot, column="trip_id", 
+                          cmap="tab20c", alpha=0.4)
 
     return base_plot
 
@@ -43,11 +44,11 @@ def get_vehicle_path_gdf(df, min_points:int = 0):
     df2["point_count"] = df.groupby("trip_id")["trip_id"].size().reset_index(
         name="point_count")["point_count"]
     df2["path"] = df2["points"].apply(convert_points_to_linestring)
-    gdf = geopandas.GeoDataFrame(df2, geometry="path", crs="EPSG:4326")
 
     if min_points:
-        gdf = gdf.query("point_count >= %i" %(min_points))
+        df2 = df2.query("point_count >= %i" %(min_points))
 
+    gdf = geopandas.GeoDataFrame(df2, geometry="path", crs="EPSG:4326")
     return gdf
 
 
