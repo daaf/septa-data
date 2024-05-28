@@ -2,7 +2,7 @@ import psycopg2
 from config import load_config
 
 def connect_to_db():
-    config = load_config()
+    config = load_config(filename='database.ini', section='postgresql')
     connection = connect(config)
     return connection
 
@@ -19,5 +19,5 @@ def connect(config):
 
 
 if __name__ == '__main__':
-    config = load_config()
+    config = load_config(filename='database.ini', section='postgresql')
     connect(config)

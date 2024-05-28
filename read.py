@@ -2,7 +2,7 @@ from psycopg2 import sql
 from config import load_config
 
 def vehicle_positions(connection):
-    table_name = load_config(section="bus_trolley_positions")["table"]
+    table_name = load_config(filename='database.ini', section="bus_trolley_positions")["table"]
     query = sql.SQL("""
             SELECT timestamp, vehicle_id, trip_id, route_id, longitude, latitude
             FROM {table}

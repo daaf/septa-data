@@ -14,11 +14,11 @@ def main():
     scheduler.start()
 
 def execute():
+    connection = connect_to_db()
     feed = get_vehicle_positions("bus")
     vehicles = parse_vehicle_position_feed(feed)
-    connection = connect_to_db()
-    table_name = load_config(section="bus_trolley_positions")["table"]
-
+    table_name = load_config(filename='database.ini', section="bus_trolley_positions")["table"]
+    
     write.to_db(connection, table_name, data=vehicles)
     connection.close()
 

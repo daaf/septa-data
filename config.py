@@ -1,11 +1,14 @@
+import os
 from configparser import ConfigParser
 
-def load_config(filename='database.ini', section='postgresql'):
-    parser = ConfigParser()
-    parser.read(filename)
+def load_config(filename=None, section=None):
 
-    # get section, default to postgresql
+    parser = ConfigParser()
+    base_dir = os.path.join(os.path.dirname(__file__))
+    path_to_config_file = os.path.join(base_dir, filename)
+    parser.read(path_to_config_file)
     config = {}
+    
     if parser.has_section(section):
         params = parser.items(section)
         for param in params:
@@ -16,5 +19,5 @@ def load_config(filename='database.ini', section='postgresql'):
     return config
 
 if __name__ == '__main__':
-    config = load_config()
+    config = load_config(filename='database.ini', section='postgresql')
     print(config)
