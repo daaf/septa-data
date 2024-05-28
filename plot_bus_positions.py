@@ -9,15 +9,15 @@ import read
 def main():
     connection = connect_to_db()
     data = read.vehicle_positions(connection)
-    column_names = ("timestamp", "vehicle_id", "longitude", "latitude", "trip_id")
+    column_names = ("timestamp", "vehicle_id", "trip_id", "route_id", "longitude", "latitude")
     df = pandas.DataFrame(data, columns=column_names).sort_values(by=['timestamp'])
     
-    plot(df)
+    plot_data(df)
     connection.close()
     
 
-def plot(df):
-    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = 28
+def plot_data(df):
+    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = 4
 
     vehicle_position_gdf = get_vehicle_position_gdf(df)
     vehicle_path_gdf = get_vehicle_path_gdf(vehicle_position_gdf,
@@ -25,7 +25,7 @@ def plot(df):
 
     base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
     base_plot = base_shapefile.plot(color='white', edgecolor="black")
-    vehicle_path_gdf.plot(ax=base_plot, markersize=5, column="trip_id")
+    vehicle_path_gdf.plot(ax=base_plot, column="trip_id")
 
     return base_plot
 
