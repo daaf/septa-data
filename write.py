@@ -4,6 +4,7 @@ from psycopg2 import sql
 
 def to_db(connection, table_name, data: list[dict]):
     loaded_count = 0
+    failed_count = 0
 
     for entity in data:
         keys = list(entity.keys())
@@ -21,9 +22,11 @@ def to_db(connection, table_name, data: list[dict]):
                 loaded_count += 1
         
         except Exception as e:
-            print(e)
+            print(f'Write to database failed with error:\n    {e}')
+            continue
 
-    to_console(f'Loaded data for {loaded_count} vehicles into the database')
+    to_console(f'Loaded data for {loaded_count} vehicles into the database.')
+    to_console(f'Data for {failed_count} vehicles failed to write to the database.')
 
 
 def to_console(str):
