@@ -2,6 +2,7 @@
 import pandas
 import geopandas
 from shapely.geometry import LineString
+from config import load_config
 from connect import connect_to_db
 import read
 
@@ -17,7 +18,7 @@ def main():
     
 
 def plot_data(df):
-    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = 7
+    MINIMUM_NUMBER_OF_POINTS_TO_PLOT = int(load_config("plotting")["min_path_points"])
 
     vehicle_position_gdf = get_vehicle_position_gdf(df)
     vehicle_path_gdf = get_vehicle_path_gdf(vehicle_position_gdf,

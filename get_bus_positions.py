@@ -7,17 +7,25 @@ from queries import get_vehicle_positions
 
 
 def main():
+    config = load_config(section="scheduler")
+    interval_minutes = int(config["interval_minutes"])
+    start_datetime = config["start_datetime"]
+    end_datetime = config["start_datetime"]
+
     scheduler = BlockingScheduler()
-    job = scheduler.add_job(execute, 'interval', minutes=5,
-                            start_date='2024-05-27 19:20:00',
-                            end_date='2024-05-28 19:20:00')
+    job = scheduler.add_job(execute, 'interval', 
+                            minutes=interval_minutes,
+                            start_date=start_datetime,
+                            end_date=end_datetime)
+    
     scheduler.start()
+
 
 def execute():
     connection = connect_to_db()
     feed = get_vehicle_positions("bus")
     vehicles = parse_vehicle_position_feed(feed)
-    table_name = load_config(filename='database.ini', section="bus_trolley_positions")["table"]
+    table_name = load_config(section="tables")["bus_trolley_positions"]
     
     write.to_db(connection, table_name, data=vehicles)
     connection.close()
