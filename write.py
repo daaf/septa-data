@@ -25,8 +25,7 @@ def to_db(connection, table_name, data: list[dict]):
             print(f'Write to database failed with error:\n    {e}')
             continue
 
-    to_console(f'Loaded data for {loaded_count} vehicles into the database.')
-    to_console(f'Data for {failed_count} vehicles failed to write to the database.')
+    to_console(f'Wrote data for {loaded_count} vehicles to database with {failed_count} failures')
 
 
 def to_console(str):
