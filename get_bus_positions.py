@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from config import load_config
