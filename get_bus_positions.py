@@ -10,7 +10,7 @@ def main():
     config = load_config(section="scheduler")
     interval_minutes = int(config["interval_minutes"])
     start_datetime = config["start_datetime"]
-    end_datetime = config["start_datetime"]
+    end_datetime = config["end_datetime"]
 
     scheduler = BlockingScheduler()
     job = scheduler.add_job(execute, 'interval', 
