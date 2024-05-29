@@ -27,7 +27,7 @@ def plot_data(df):
     base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
     base_plot = base_shapefile.plot(color='white', edgecolor="black")
     vehicle_path_gdf.plot(ax=base_plot, column="trip_id", 
-                          cmap="tab20c", alpha=0.4)
+                          cmap="nipy_spectral", alpha=0.2)
 
     return base_plot
 
