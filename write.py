@@ -22,8 +22,9 @@ def to_db(connection, table_name, data: list[dict]):
                 loaded_count += 1
         
         except Exception as e:
-            print(f'Write to database failed with error:\n    {e}')
-            continue
+            print(f'Write to database failed with error:\n"{e}"')
+            failed_count += 1
+            connection.rollback()
 
     to_console(f'Wrote data for {loaded_count} vehicles to database with {failed_count} failures')
 
