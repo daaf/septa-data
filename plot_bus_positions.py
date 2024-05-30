@@ -2,6 +2,8 @@
 import pandas
 import geopandas
 from shapely.geometry import LineString
+import numpy
+from matplotlib import pyplot
 from config import load_config
 from connect import connect_to_db
 import read
@@ -26,8 +28,17 @@ def plot_data(df):
     
     base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
     base_plot = base_shapefile.plot(color='white', edgecolor="black")
-    vehicle_path_gdf.plot(ax=base_plot, column="trip_id", 
-                          cmap="nipy_spectral", alpha=0.2)
+
+    cmap = pyplot.get_cmap('viridis')
+    route_data = vehicle_path_gdf["route_id"]
+    routes = route_data.unique().tolist()
+    route_count = len(routes)
+    colors = cmap(numpy.linspace(0, 1, route_count))
+
+    for (route, color) in zip(routes, colors):
+        route_data = vehicle_path_gdf.query(f'route_id == "{route}"')
+        if len(route_data):
+            route_data.plot(ax=base_plot, markersize=5, column="route_id", c=color)
 
     return base_plot
 
@@ -40,9 +51,9 @@ def get_vehicle_position_gdf(df):
 
 
 def get_vehicle_path_gdf(df, min_points:int = 0):
-    df2 = pandas.DataFrame(df[["trip_id", "point"]])
-    df2 = df2.groupby("trip_id")["point"].agg(list).reset_index(name="points")
-    df2["point_count"] = df.groupby("trip_id")["trip_id"].size().reset_index(
+    df2 = pandas.DataFrame(df[["route_id", "trip_id", "point"]])
+    df2 = df2.groupby(["route_id", "trip_id"])["point"].agg(list).reset_index(name="points")
+    df2["point_count"] = df.groupby(["route_id", "trip_id"])["trip_id"].size().reset_index(
         name="point_count")["point_count"]
     df2["path"] = df2["points"].apply(convert_points_to_linestring)
 
@@ -69,3 +80,4 @@ def convert_points_to_linestring(points: list):
 
 if __name__ == "__main__":
     main()
+# %%
