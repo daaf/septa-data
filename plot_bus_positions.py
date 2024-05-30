@@ -27,9 +27,9 @@ def plot_data(df):
                                             MINIMUM_NUMBER_OF_POINTS_TO_PLOT)
     
     base_shapefile = geopandas.read_file('assets/philadelphia.geojson')
-    base_plot = base_shapefile.plot(color='white', edgecolor="black")
+    base_plot = base_shapefile.plot(color='white', edgecolor="black", legend=True)
 
-    cmap = pyplot.get_cmap('viridis')
+    cmap = pyplot.get_cmap("tab20")
     route_data = vehicle_path_gdf["route_id"]
     routes = route_data.unique().tolist()
     route_count = len(routes)
@@ -38,7 +38,7 @@ def plot_data(df):
     for (route, color) in zip(routes, colors):
         route_data = vehicle_path_gdf.query(f'route_id == "{route}"')
         if len(route_data):
-            route_data.plot(ax=base_plot, markersize=5, column="route_id", c=color)
+            route_data.plot(ax=base_plot, label=route, color=color, alpha=0.4)
 
     return base_plot
 
