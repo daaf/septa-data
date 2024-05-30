@@ -4,7 +4,7 @@ from config import load_config
 def vehicle_positions(connection):
     table_name = load_config(section="tables")["bus_trolley_positions"]
     query = sql.SQL("""
-            SELECT timestamp, vehicle_id, trip_id, route_id, longitude, latitude
+            SELECT DISTINCT timestamp, vehicle_id, trip_id, route_id, longitude, latitude
             FROM {table}
             ORDER BY timestamp;
         """).format(table=sql.Identifier(table_name))
