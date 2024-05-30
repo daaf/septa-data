@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from datetime import datetime
-from apscheduler.schedulers.blocking import BlockingScheduler
 from config import load_config
 from connect import connect_to_db
 import write
@@ -9,21 +8,6 @@ from queries import get_vehicle_positions
 
 
 def main():
-    config = load_config(section="scheduler")
-    interval_minutes = int(config["interval_minutes"])
-    start_datetime = config["start_datetime"]
-    end_datetime = config["end_datetime"]
-
-    scheduler = BlockingScheduler()
-    job = scheduler.add_job(execute, 'interval', 
-                            minutes=interval_minutes,
-                            start_date=start_datetime,
-                            end_date=end_datetime)
-    
-    scheduler.start()
-
-
-def execute():
     connection = connect_to_db()
     feed = get_vehicle_positions("bus")
     vehicles = parse_vehicle_position_feed(feed)
